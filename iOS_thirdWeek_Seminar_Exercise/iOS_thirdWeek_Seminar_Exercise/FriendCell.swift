@@ -12,10 +12,9 @@ class FriendCell: UITableViewCell {
 
     static let identifier: String = "FriendCell"
     
-    @IBOutlet weak var profileButton: UIButton!
+    @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var messageLabel: UILabel!
-    
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -30,7 +29,7 @@ class FriendCell: UITableViewCell {
     
     func setFriend(image: String, name: String, message: String?){
     
-        profileButton.setImage(UIImage(named: image), for: UIControl.State.normal)
+        profileImageView.image = UIImage(named: image)
         nameLabel.text = name
         messageLabel.text = message
     }
