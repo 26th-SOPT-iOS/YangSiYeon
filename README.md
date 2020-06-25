@@ -128,3 +128,119 @@ acBtn.layer.cornerRadius = 0.5 * acBtn.bounds.size.width
 4) Image View를 추가하고, 아래의 콘텐츠들은 계산기 과제와 똑같이 Stack View와 CornerRadius를 이용해서 구현한다.
 5) 아래 콘텐츠를 다 구현했으면 Scroll View 바로 밑의 View에 23의 constraint값을 주면서 Scroll View의 크기를 알려준다. (중요⭐️)
 
+
+## 3차 과제
+* 실행화면 
+
+![3차과제](https://user-images.githubusercontent.com/37260938/85789842-42999800-b76a-11ea-8b74-28759f007120.gif)
+
+### 1️⃣ Tabbar Controller를 활용한 화면 이동
+📝 개발 과정
+1) 먼저 View Controller를 생성하고 Tab Bar Controller를 Embed in 또는 relationship segue 시켜준다.
+2) 똑똑한 Xcode가 알아서 탭바를 만들어주면 ViewController의 Tab Bar Item에서 선택되었을 때 이미지와 기본 이미지(선택 안되었을 때 이미지)를 선택해준다.
+
+<img width="260" alt="스크린샷 2020-06-26 오전 5 04 57" src="https://user-images.githubusercontent.com/37260938/85790083-9dcb8a80-b76a-11ea-87ce-abc842d44912.png">
+
+3) 기본적으로 제공되는 이미지를 이용하면 색이 파란색이다. 이때, Tab Bar Item의 색상을 바꿔주기 위해서는 Tab Bar Controller에서 Image Tint 색상을 바꿔주어야 한다.
+
+<img width="257" alt="스크린샷 2020-06-26 오전 5 09 29" src="https://user-images.githubusercontent.com/37260938/85790465-37933780-b76b-11ea-9746-b7324ce357d6.png">
+
+### 2️⃣ Table View로 화면 구성하기
+
+다른 iOS 파트원들은 제일 상단의 내 정보 부분을 섹션을 나눠서 또 다른 Table View Cell로 처리했던데,, 안드로이드에 익숙해서 그런지 그런 생각을 전!혀! 하지 못했다.
+"어차피 하나 나오는 뷰니까~ 고냥 View로 감싸서 박자~" 라고 생각했다. 나 자신 반성,, 그래서 뷰 구조가 아래와 같다.
+
+<img width="232" alt="스크린샷 2020-06-26 오전 5 10 54" src="https://user-images.githubusercontent.com/37260938/85790733-b12b2580-b76b-11ea-8f12-d9935d76c53d.png">
+
+📝 개발 과정
+1) 스토리보드에 뷰를 그린다.
+2) ViewController에 FriendListViewController.swift 파일을 연결한다. 이 소스코드에서 중요한 부분은 다음과 같다.
+
+👉 데이터를 뿌려주기 위해서 더미 데이터 리스트를 만들고 viewDidLoad() 함수에서 불러준다. (하드코딩된 부분이 많으므로 생략!)
+👉 Table View의 이벤트를 대신 처리해 줄 객체를 지정한다.
+```swift
+ override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setFriendList()
+        
+        friendTableView.delegate = self
+        friendTableView.dataSource = self
+        
+    }
+```
+👉 Table View에 들어갈 값에 대한 정의와 이벤트를 아래와 같이 구현한다.
+
+각 함수가 하는 일은 위에서 부터 차례대로 Table Cell의 개수 return, Table Cell 설정, Table Cell 1개의 높이 지정 이다.
+
+```swift
+extension FriendListViewController : UITableViewDataSource{
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return friendsList.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let friendCell = tableView.dequeueReusableCell(withIdentifier: FriendCell.identifier, for: indexPath) as? FriendCell else {return UITableViewCell()}
+        
+        friendCell.setFriend(image: friendsList[indexPath.row].profileImage, name: friendsList[indexPath.row].userName, message: friendsList[indexPath.row].message)
+        
+        return friendCell
+    }
+}
+
+extension FriendListViewController : UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 62
+    
+    }
+}
+```
+
+
+3) 자 바로 위 코드에 있는 friendCell이란 무엇인가! 바로 Table View Cell에 대한 설정을 하기 위해 소스코드가 하나 더 필요하다. 나는 FriendCell.swift 라는 이름으로 파일을 하나 만들어 주었다.
+
+👉 스토리보드에서 Table View Cell을 선택하고 Custom Class로 FriendCell을 지정해준다. 
+
+👉 또한 Identifier도 설정해준다.
+
+<img width="259" alt="스크린샷 2020-06-26 오전 5 29 38" src="https://user-images.githubusercontent.com/37260938/85792157-09632700-b76e-11ea-8b35-68df680478f3.png">
+
+👉 FriendCell.swift에서는 Table View Cell의 아울렛들을 가져와서 이름을 지어주고, 이들을 설정하는 코드를 작성해준다.
+
+```swift
+import UIKit
+
+class FriendCell: UITableViewCell {
+
+    static let identifier: String = "FriendCell"
+    
+    @IBOutlet weak var profileImageView: UIImageView!
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var messageLabel: UILabel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+    func setFriend(image: String, name: String, message: String?){
+    
+        profileImageView.image = UIImage(named: image)
+        nameLabel.text = name
+        messageLabel.text = message
+    }
+}
+```
+
+### 3️⃣ (도전 과제) Table View Cell 왼쪽으로 밀어서 삭제하기
+
+
+
+
