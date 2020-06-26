@@ -240,6 +240,69 @@ class FriendCell: UITableViewCell {
 ```
 
 ### 3️⃣ (도전 과제) Table View Cell 왼쪽으로 밀어서 삭제하기
+도전 과제 치고는 생각보다 쉽게 해결할 수 있었다.
+
+📝 개발 과정
+Table View에 들어갈 값에 대한 정의를 해주는 extension 객체에 다음과 같은 일을 추가한다.
+
+1) 우선 canEditRowAt이 들어있는 함수에서 true를 반환하여 row를 편집할 수 있도록 한다.
+
+```swift
+func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    return true
+}
+```
+2) 아래와 같은 함수로 tableView를 edit할 때 일어나는 일을 구현한다.
+
+해당 코드는 tableView에서 삭제가 일어날 때 tableView에 뿌려지는 friendList에서 삭제할 데이터를 없애고 tableView를 업데이트하는 코드이다. tableView 업데이트 후엔 상단에 위치한 친구의 수를 나타낸 label의 text를 friendList의 사이즈로 바꿔준다. 
+
+💡 가장아래에 있는 tableView.reloadData()를 이용하면 위에서 어떤 일을 한 다음에 tableView를 새로 로드해서 뷰가 새로 그려지게 된다. 하지만 이 코드를 사용하면 그냥 뷰가 다시 그려지는 것이기 때문에 내가 삭제한 셀이 없어진건지 파악하기가 어렵고, 개인적으로 iOS의 장점이라고 생각하는 예쁜 애니메이션도 없다. 그래서 구글링을 통해 더 찾아본 결과 deleteRows()라는 함수를 사용하면 실제로 tableView의 indexPath에 위치한 row를 지웠다고 알려주고 이에 맞는 애니메이션도 예쁘게 생긴다! (ㅎㅎ 뿌듯)
+
+```swift
+func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if(editingStyle == .delete){
+            // friendList에서 해당 data 삭제 후 table view 업데이트
+            friendsList.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
+        
+            friendCountLabel.text = "친구 \(friendsList.count)"
+            // tableView.reloadData()
+        }
+    }
+```
+
+### 4️⃣ (도전 과제) 설정 버튼 누르면 하단에서 Action Sheet 뜨게 하기
+📝 개발 과정
+
+1) 세팅 버튼을 클릭 IBAction 함수를 만든다.
+2) UIAlertController 객체를 만들고 preferredStyle은 actionSheet로 지정해준다.
+3) UIAlertAction 객체를 만들어주고 UIAlertController에 달아준다.
+4) UIAlertController를 present로 띄워준다!
+
+💡  밑에서 올라오는 애는 Action Sheet이고 가운데에 빡 뜨는 애는 Alert이다. Alert 형태로 띄우고 싶으면 preferredStyle을 alert로 지정해주면 된다. alert는 말그대로 경고창 같은 것이기 때문에 선택지가 1개인 경우에 주로 사용한다!
+
+```swift
+@IBAction func touchSettingBtn(_ sender: UIButton) {
+        let settingMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let manageFriendAcition = UIAlertAction(title:"친구 관리", style: .default, handler:{ (alert: UIAlertAction!) -> Void in
+        })
+        let settingAllAcition = UIAlertAction(title:"전체 설정", style: .default, handler:{
+            (alert: UIAlertAction!) -> Void in
+        })
+        let cancleAction = UIAlertAction(title:"취소", style: .cancel, handler:{
+            (alert: UIAlertAction!) -> Void in
+        })
+        
+        settingMenu.addAction(manageFriendAcition)
+        settingMenu.addAction(settingAllAcition)
+        settingMenu.addAction(cancleAction)
+        
+        self.present(settingMenu, animated: true, completion: nil)
+        
+    }
+```
+
 
 
 
