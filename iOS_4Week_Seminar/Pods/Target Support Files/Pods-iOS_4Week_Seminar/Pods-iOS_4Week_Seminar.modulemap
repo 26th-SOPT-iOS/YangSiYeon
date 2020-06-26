@@ -1,0 +1,6 @@
+framework module Pods_iOS_4Week_Seminar {
+  umbrella header "Pods-iOS_4Week_Seminar-umbrella.h"
+
+  export *
+  module * { export * }
+}
